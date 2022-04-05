@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var pushReceivedGroupChannel: String?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        SBDMain.initWithApplicationId("9880C4C1-E6C8-46E8-A8F1-D5890D598C08")
+        SBDMain.initWithApplicationId("DF8FD2C0-2FF3-44A1-A61D-D9C22A8A12FE")
         SBDMain.add(self as SBDChannelDelegate, identifier: self.description)
         self.registerForRemoteNotification()
         SBDMain.setAppGroup("group.com.sendbird.sample4");
@@ -37,13 +37,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         } catch {
             print("Setting category to AVAudioSessionCategoryPlayback failed.")
         }
-//        self.window = UIWindow(frame: UIScreen.main.bounds)
-//        if let window = self.window {
-//            let mainStoryboard = UIStoryboard.init(name: "Main", bundle: nil)
-//            let viewController = mainStoryboard.instantiateViewController(withIdentifier: "LoginViewController")
-//            window.rootViewController = viewController
-//            window.makeKeyAndVisible()
-//        }
+        self.window = UIWindow(frame: UIScreen.main.bounds)
+        if let window = self.window {
+        let mainStoryboard = UIStoryboard.init(name: "Main", bundle: nil)
+        let viewController = mainStoryboard.instantiateViewController(withIdentifier: "LoginViewController")
+        window.rootViewController = viewController
+        window.makeKeyAndVisible()
+    }
         
         return true
     }
@@ -123,6 +123,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        // Register a device token to Sendbird server.
         SBDMain.registerDevicePushToken(deviceToken, unique: true) { (status, error) in
             if error == nil {
                 if status == SBDPushTokenRegistrationStatus.pending {

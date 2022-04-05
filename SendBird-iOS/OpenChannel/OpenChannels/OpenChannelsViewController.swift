@@ -10,6 +10,7 @@ import UIKit
 import SendBirdSDK
 import AlamofireImage
 
+
 class OpenChannelsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, CreateOpenChannelDelegate, OpenChanannelChatDelegate, NotificationDelegate {
     @IBOutlet weak var openChannelsTableView: UITableView!
     @IBOutlet weak var loadingIndicatorView: CustomActivityIndicatorView!
@@ -22,13 +23,18 @@ class OpenChannelsViewController: UIViewController, UITableViewDelegate, UITable
     var channelNameFilter: String?
     var createChannelBarButton: UIBarButtonItem?
     
+
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // Do any additional setup after loading the view.
+        
         self.title = "Open Channels"
         self.navigationController?.title = "Open"
         self.navigationItem.largeTitleDisplayMode = .automatic
+        
         
         self.createChannelBarButton = UIBarButtonItem(image: UIImage(named: "img_btn_create_public_group_channel_blue"), style: .plain, target: self, action: #selector(OpenChannelsViewController.clickCreateOpenChannel(_:)))
         self.navigationItem.rightBarButtonItem = self.createChannelBarButton
@@ -54,6 +60,7 @@ class OpenChannelsViewController: UIViewController, UITableViewDelegate, UITable
         self.loadChannelListNextPage(refresh: true, channelNameFilter: self.channelNameFilter)
 
     }
+    
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowOpenChat", let navigation = segue.destination as? UINavigationController, let destination = navigation.children.first as? OpenChannelChatViewController, let selectedChannel = sender as? SBDOpenChannel{

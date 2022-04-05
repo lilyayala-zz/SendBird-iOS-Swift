@@ -10,7 +10,7 @@ import UIKit
 import SendBirdSDK
 import AlamofireImage
 
-class GroupChannelsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, SBDChannelDelegate, SBDConnectionDelegate, NotificationDelegate, CreateGroupChannelViewControllerDelegate, GroupChannelsUpdateListDelegate {
+class GroupChannelsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, SBDConnectionDelegate, NotificationDelegate, CreateGroupChannelViewControllerDelegate, GroupChannelsUpdateListDelegate, SBDGroupChannelCollectionDelegate {
     @IBOutlet weak var groupChannelsTableView: UITableView!
     @IBOutlet weak var loadingIndicatorView: CustomActivityIndicatorView!
     @IBOutlet weak var toastView: UIView!
@@ -21,6 +21,7 @@ class GroupChannelsViewController: UIViewController, UITableViewDelegate, UITabl
     var trypingIndicatorTimer: [String : Timer] = [:]
     
     var channelListQuery: SBDGroupChannelListQuery?
+    var channelCollection: SBDGroupChannelCollection?
     var channels: [SBDGroupChannel] = []
     var toastCompleted: Bool = true
     
@@ -54,14 +55,16 @@ class GroupChannelsViewController: UIViewController, UITableViewDelegate, UITabl
         self.updateTotalUnreadMessageCountBadge()
         
         self.loadChannelListNextPage(true)
-        
-        SBDMain.add(self as SBDChannelDelegate, identifier: NSUUID().uuidString)
-        SBDMain.add(self as SBDConnectionDelegate, identifier: NSUUID().uuidString)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.groupChannelsTableView.layoutIfNeeded()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.channelCollection?.dispose()
     }
     
     func showToast(message: String, completion: (() -> Void)?) {
@@ -400,6 +403,7 @@ class GroupChannelsViewController: UIViewController, UITableViewDelegate, UITabl
         self.loadChannelListNextPage(true)
     }
     
+    
     func loadChannelListNextPage(_ refresh: Bool) {
         if refresh {
             self.channelListQuery = nil
@@ -410,42 +414,54 @@ class GroupChannelsViewController: UIViewController, UITableViewDelegate, UITabl
             self.channelListQuery?.order = .latestLastMessage
             self.channelListQuery?.limit = 20
             self.channelListQuery?.includeEmptyChannel = true
+            
+            
+            //filter channel by custom_type --uncomment to list all channels--
+            self.channelListQuery?.customTypesFilter = ["Lily"]
+            
+            // Create a SBDGroupChannelCollection.
+            self.channelCollection = SBDGroupChannelCollection(query: self.channelListQuery!)
+            self.channelCollection!.delegate = self
         }
         
         if self.channelListQuery?.hasNext == false {
             return
         }
         
-        self.channelListQuery?.loadNextPage(completionHandler: { (channels, error) in
-            if error != nil {
+        // Load channels.
+        if self.channelCollection!.hasMore {
+            self.channelCollection!.loadMore { channels, error in
+                // Add channels to datasource.
+                if error != nil {
+                    DispatchQueue.main.async {
+                        self.refreshControl?.endRefreshing()
+                    }
+                    
+                    return
+                }
+                
                 DispatchQueue.main.async {
+                    if refresh {
+                        self.channels.removeAll()
+                    }
+                    
+                    self.channels += channels!
+                    self.groupChannelsTableView.reloadData()
                     self.refreshControl?.endRefreshing()
                 }
-                
-                return
             }
-            
-            DispatchQueue.main.async {
-                if refresh {
-                    self.channels.removeAll()
-                }
-                
-                self.channels += channels!
-                self.groupChannelsTableView.reloadData()
-                self.refreshControl?.endRefreshing()
-            }
-        })
+        }
     }
     
     // MARK: - CreateGroupChannelViewControllerDelegate
     func didCreateGroupChannel(_ channel: SBDGroupChannel) {
-        DispatchQueue.main.async {
-            if self.channels.firstIndex(of: channel) == nil {
-                self.channels.insert(channel, at: 0)
-            }
-            
-            self.groupChannelsTableView.reloadData()
-        }
+//        DispatchQueue.main.async {
+//            if self.channels.firstIndex(of: channel) == nil {
+//                self.channels.insert(channel, at: 0)
+//            }
+//
+//            self.groupChannelsTableView.reloadData()
+//        }
     }
     
     // MARK: - GroupChannelsUpdateListDelegate
@@ -453,98 +469,65 @@ class GroupChannelsViewController: UIViewController, UITableViewDelegate, UITabl
         DispatchQueue.main.async {
             self.groupChannelsTableView.reloadData()
         }
-        
+
         self.updateTotalUnreadMessageCountBadge()
     }
+
     
-    // MARK: - SBDChannelDelegate
-    func channel(_ sender: SBDBaseChannel, didReceive message: SBDBaseMessage) {
-        DispatchQueue.main.async {
-            if sender is SBDGroupChannel {
-                var hasChannelInList = false
-                for ch in self.channels {
-                    if ch.channelUrl == sender.channelUrl {
-                        self.channels.removeObject(ch)
-                        self.channels.insert(ch, at: 0)
-                        self.groupChannelsTableView.reloadData()
-                        self.updateTotalUnreadMessageCountBadge()
-                        
-                        hasChannelInList = true
+    // MARK: - SBDGroupChannelCollectionDelegate
+    func channelCollection(_ collection: SBDGroupChannelCollection, context: SBDChannelContext, addedChannels channels: [SBDGroupChannel]) {
+        // Add channels to the datasource.
+        // Called whenever a new channel is added. (real-time events, changelog on reconnection)
+        for channel in channels {
+            if self.channels.firstIndex(of: channel) == nil {
+                // order.
+                var index = 0
+                for comparingChannel in self.channels {
+                    let compareResult = SBDGroupChannel.compare(withChannelA: channel, channelB: comparingChannel, order: .latestLastMessage)
+                    if compareResult.rawValue == -1 {
                         break
                     }
+                    index += 1
                 }
                 
-                if hasChannelInList == false {
-                    self.channels.insert(sender as! SBDGroupChannel, at: 0)
-                    self.groupChannelsTableView.reloadData()
-                    self.updateTotalUnreadMessageCountBadge()
-                }
+                self.channels.insert(channel, at: index)
             }
         }
-    }
-    
-    func channelDidUpdateTypingStatus(_ sender: SBDGroupChannel) {
-        if let timer = self.trypingIndicatorTimer[sender.channelUrl] {
-            timer.invalidate()
-        }
-        
-        let timer = Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(GroupChannelsViewController.typingIndicatorTimeout(_ :)), userInfo: sender.channelUrl, repeats: false)
-        self.trypingIndicatorTimer[sender.channelUrl] = timer
         
         DispatchQueue.main.async {
             self.groupChannelsTableView.reloadData()
         }
     }
     
-    func channel(_ sender: SBDGroupChannel, userDidJoin user: SBDUser) {
-        DispatchQueue.main.async {
-            if self.channels.firstIndex(of: sender) == nil {
-                self.channels.insert(sender, at: 0)
+    func channelCollection(_ collection: SBDGroupChannelCollection, context: SBDChannelContext, updatedChannels channels: [SBDGroupChannel]) {
+        // Update channels to the datasource.
+        // Called whenever a channel is updated. (real-time events, changelog on reconnection)
+        for ch in channels {
+            if let originalIndex = self.channels.firstIndex(of: ch) {
+                // the channel already existed in channels.
+                self.channels[originalIndex] = ch
+            } else {
+                self.channels.insert(ch, at: 0)
             }
-            self.groupChannelsTableView.reloadData()
         }
-    }
-    
-    func channel(_ sender: SBDGroupChannel, userDidLeave user: SBDUser) {
-        DispatchQueue.main.async {
-            if let index = self.channels.firstIndex(of: sender as SBDGroupChannel) {
-                self.channels.remove(at: index)
-            }
-            self.groupChannelsTableView.reloadData()
-        }
-    }
-    
-    func channelWasChanged(_ sender: SBDBaseChannel) {
         DispatchQueue.main.async {
             self.groupChannelsTableView.reloadData()
         }
     }
     
-    func channel(_ sender: SBDBaseChannel, messageWasDeleted messageId: Int64) {
-        if sender is SBDGroupChannel {
-            var hasChannelInList = false
-            for ch in self.channels {
-                if ch.channelUrl == sender.channelUrl {
-                    DispatchQueue.main.async {
-                        self.channels.removeObject(ch)
-                        self.channels.insert(ch, at: 0)
-                        self.groupChannelsTableView.reloadData()
-                        self.updateTotalUnreadMessageCountBadge()
-                    }
-                    
-                    hasChannelInList = true
-                }
-            }
-            
-            if hasChannelInList == false {
-                DispatchQueue.main.async {
-                    self.channels.insert(sender as! SBDGroupChannel, at: 0)
-                    self.groupChannelsTableView.reloadData()
-                    self.updateTotalUnreadMessageCountBadge()
-                }
+    func channelCollection(_ collection: SBDGroupChannelCollection, context: SBDChannelContext, deletedChannelUrls: [String]) {
+        // Delete channels with deletedChannelUrls from the datasource.
+        // Called whenever a channel is deleted. (real-time events, changelog on reconnection)
+        for url in deletedChannelUrls {
+            if let deletedChannel = self.channels.filter({ $0.channelUrl == url }).first {
+                self.channels.removeObject(deletedChannel)
             }
         }
+        DispatchQueue.main.async {
+            self.groupChannelsTableView.reloadData()
+        }
     }
+    
     
     // MARK: - Utilities
     private func showLoadingIndicatorView() {

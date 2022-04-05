@@ -95,8 +95,11 @@ class ConnectionManager: NSObject, SBDConnectionDelegate {
         self.sharedInstance.login(userId: userId, nickname: nickname, completionHandler: completionHandler)
     }
     
+    
+    
     private func login(userId: String, nickname: String, completionHandler: ((_ user: SBDUser?, _ error: NSError?) -> Void)?) {
         SBDMain.connect(withUserId: userId) { (user, error) in
+            
             let userDefault = UserDefaults.standard
             
             if let theError: NSError = error {

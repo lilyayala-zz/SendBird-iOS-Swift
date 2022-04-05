@@ -22,6 +22,7 @@ class GroupChannelTableViewCell: UITableViewCell {
     @IBOutlet weak var typingIndicatorImageView: FLAnimatedImageView!
     @IBOutlet weak var typingIndicatorLabel: UILabel!
     @IBOutlet weak var profileImagView: ProfileImageView!
+    @IBOutlet weak var customTypeChannel: UILabel!
     
     override func awakeFromNib() {
         super.awakeFromNib()

@@ -56,6 +56,7 @@ class GroupChannelCoverImageNameSettingViewController: UIViewController, UIImage
                 continue
             }
             currentMembers.append(member)
+           
             count += 1
             if count == 4 {
                 break

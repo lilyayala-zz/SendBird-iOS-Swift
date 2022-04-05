@@ -115,6 +115,13 @@ class CreateGroupChannelViewControllerA: UIViewController, UITableViewDelegate, 
         self.loadUserListNextPage(true)
     }
     
+    func loadGroupList(_ refresh: Bool){
+ 
+        
+        
+        
+    }
+    
     func loadUserListNextPage(_ refresh: Bool) {
         if refresh {
             self.userListQuery = nil
@@ -224,7 +231,9 @@ class CreateGroupChannelViewControllerA: UIViewController, UITableViewDelegate, 
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.users.count
+        //?custom_types=urlencoded_type_1,urlencoded_type_2
     }
+    
     
     // MARK: - UITableViewDelegate
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

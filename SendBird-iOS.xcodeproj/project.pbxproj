@@ -1197,13 +1197,13 @@
 				CODE_SIGN_ENTITLEMENTS = "SendBird-iOS/SendBird-iOS.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RM4A5PXTUX;
+				DEVELOPMENT_TEAM = 86WQXF56BC;
 				INFOPLIST_FILE = "SendBird-iOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.sendbird.sample4;
+				PRODUCT_BUNDLE_IDENTIFIER = com.samplesendbird.chat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"SWIFT_ACTIVE_COMPILATION_CONDITIONS[arch=*]" = SIMULATOR;
@@ -1221,13 +1221,13 @@
 				CODE_SIGN_ENTITLEMENTS = "SendBird-iOS/SendBird-iOS.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RM4A5PXTUX;
+				DEVELOPMENT_TEAM = 86WQXF56BC;
 				INFOPLIST_FILE = "SendBird-iOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.sendbird.sample4;
+				PRODUCT_BUNDLE_IDENTIFIER = com.samplesendbird.chat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
@@ -1243,7 +1243,7 @@
 				CODE_SIGN_ENTITLEMENTS = DeliveryReceiptNotificationService/DeliveryReceiptNotificationService.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RM4A5PXTUX;
+				DEVELOPMENT_TEAM = 86WQXF56BC;
 				INFOPLIST_FILE = DeliveryReceiptNotificationService/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1251,7 +1251,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.sendbird.sample4.DeliveryReceiptNotificationService;
+				PRODUCT_BUNDLE_IDENTIFIER = com.samplesendbird.chat.ex;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -1267,7 +1267,7 @@
 				CODE_SIGN_ENTITLEMENTS = DeliveryReceiptNotificationService/DeliveryReceiptNotificationService.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RM4A5PXTUX;
+				DEVELOPMENT_TEAM = 86WQXF56BC;
 				INFOPLIST_FILE = DeliveryReceiptNotificationService/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1275,7 +1275,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.sendbird.sample4.DeliveryReceiptNotificationService;
+				PRODUCT_BUNDLE_IDENTIFIER = com.samplesendbird.chat.ex;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;

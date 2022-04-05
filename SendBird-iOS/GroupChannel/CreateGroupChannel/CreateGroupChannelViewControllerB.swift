@@ -15,6 +15,7 @@ import Photos
 
 class CreateGroupChannelViewControllerB: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, RSKImageCropViewControllerDelegate, NotificationDelegate {
     var members: [SBDUser] = []
+    var users: [String] = []
     
     @IBOutlet weak var profileImageView: ProfileImageView!
     
@@ -36,16 +37,21 @@ class CreateGroupChannelViewControllerB: UIViewController, UIImagePickerControll
         self.coverImageData = nil
         self.view.bringSubviewToFront(self.loadingIndicatorView)
         self.loadingIndicatorView.isHidden = true
-        
         var memberNicknames: [String] = []
         var memberCount: Int = 0
         for user in self.members {
             memberNicknames.append(user.nickname!)
+            //Appending lily to chat name
+            memberNicknames.append(" (Lily) ") // <---- comment to Not append Lily
+
             memberCount += 1
+            
             if memberCount == 4 {
                 break
             }
         }
+        
+        
         
         let channelNamePlaceholder = memberNicknames.joined(separator: ", ")
         self.channelNameTextField.attributedPlaceholder = NSAttributedString(string: channelNamePlaceholder, attributes: [
@@ -97,15 +103,18 @@ class CreateGroupChannelViewControllerB: UIViewController, UIImagePickerControll
         self.showLoadingIndicatorView()
         
         let channelName = self.channelNameTextField.text != "" ? self.channelNameTextField.text : self.channelNameTextField.placeholder
-        
+    
+
         let params = SBDGroupChannelParams()
         params.coverImage = self.coverImageData
-        params.add(self.members)
         params.name = channelName
-        
-        
-        SBDGroupChannel.createChannel(with: params) { (channel, error) in
+        params.add(members)
+        params.customType = "Lily" //<--- comment to stop adding "Lily" custom type
+    
+        SBDGroupChannel.createChannel(with: params) { (groupChannel, error) in
             self.hideLoadingIndicatorView()
+
+
             
             if let error = error {
                 let alertController = UIAlertController(title: "Error", message: error.domain, preferredStyle: .alert)
@@ -121,12 +130,13 @@ class CreateGroupChannelViewControllerB: UIViewController, UIImagePickerControll
 
             if let navigationController = self.navigationController as? CreateGroupChannelNavigationController{
                 if (navigationController.channelCreationDelegate?.responds(to: #selector(CreateGroupChannelNavigationController.didChangeValue(forKey:))))! {
-                    navigationController.channelCreationDelegate?.didCreateGroupChannel(channel!)
+                    navigationController.channelCreationDelegate?.didCreateGroupChannel(groupChannel!)
                 }
                 self.navigationController?.dismiss(animated: true, completion: nil)
             }
         }
     }
+    
     
     func cropImage(_ imageData: Data) {
         if let image = UIImage(data: imageData) {

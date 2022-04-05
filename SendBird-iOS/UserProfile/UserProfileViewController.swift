@@ -48,8 +48,10 @@ class UserProfileViewController: UIViewController, NotificationDelegate {
     
     func refreshUserInfo(_ user: SBDUser) {
         self.profileImageView.setProfileImageView(for: user)
+    
         
         self.nicknameLabel.text = user.nickname
+        
         
         if user.connectionStatus == .online {
             self.onlineStateImageView.image = UIImage(named: "img_online")

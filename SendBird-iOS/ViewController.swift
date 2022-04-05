@@ -7,12 +7,16 @@
 //
 
 import UIKit
+import SendBirdSDK
+
+
 
 class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
     }
 }
 
@@ -20,6 +24,7 @@ enum SendBirdStoryBoard : String {
     case GroupChat = "GroupChat"
     case OpenChat = "OpenChat"
     case Settings = "Settings"
+    case CustomType = "CustomType"
     var instance : UIStoryboard {
         return UIStoryboard(name: self.rawValue, bundle: Bundle.main)
     }
