@@ -1,3 +1,15 @@
+### SendBird app forked from sample swift app
+
+Check the following files to see code for item #16 
+
+DeliveryReceiptNotificationService > NotificationService
+Followed this guide: https://sendbird.com/docs/chat/v3/ios/guides/push-notifications
+
+Change sample app code so that it will show notification(like we get push notifications when we are offline) when we have a new message from one of my group channels in “Group channels” list screen. This can be done by changing onMessageReceived(or didReceiveMessage) callback of SendBird.ChannelHandler(or SBDChannelDelegate) and in the reference of push notification handling of the sample app.
+
+
+
+
 # [Sendbird](https://sendbird.com) Chat SDK for iOS (Swift)
 
 [![Platform](https://img.shields.io/badge/Platform-iOS-orange.svg)](https://cocoapods.org/pods/SendBirdSDK)
@@ -232,3 +244,4 @@ openChannel?.sendUserMessage(MESSAGE, data: DATA, customType: CUSTOM_TYPE, compl
     }
 })
 ```
+
